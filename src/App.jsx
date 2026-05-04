@@ -1,39 +1,48 @@
-import { useState } from "react";
+import { Routes, Route, Link } from "react-router-dom";
+
+function Home() {
+  return (
+    <div>
+      <h1>Welcome to Ztmetta 🚀</h1>
+      <p>This is the home page</p>
+    </div>
+  );
+}
+
+function About() {
+  return (
+    <div>
+      <h1>About</h1>
+      <p>This project is for astrology calculation.</p>
+    </div>
+  );
+}
+
+function Contact() {
+  return (
+    <div>
+      <h1>Contact</h1>
+      <p>Email: zawtunit@gmail.com</p>
+    </div>
+  );
+}
 
 function App() {
-  const [page, setPage] = useState("home");
-
   return (
-    <div style={{ textAlign: "center", marginTop: "30px" }}>
-      
+    <div>
       {/* Navigation */}
       <div style={{ marginBottom: "20px" }}>
-        <button onClick={() => setPage("home")}>Home</button>{" "}
-        <button onClick={() => setPage("about")}>About</button>{" "}
-        <button onClick={() => setPage("contact")}>Contact</button>
+        <Link to="/">Home</Link> |{" "}
+        <Link to="/about">About</Link> |{" "}
+        <Link to="/contact">Contact</Link>
       </div>
 
-      {/* Pages */}
-      {page === "home" && (
-        <div>
-          <h1>Welcome to Ztmetta 🚀</h1>
-          <p>This is the home page</p>
-        </div>
-      )}
-
-      {page === "about" && (
-        <div>
-          <h1>About</h1>
-          <p>This project is for astrology calculation.</p>
-        </div>
-      )}
-
-      {page === "contact" && (
-        <div>
-          <h1>Contact</h1>
-          <p>Email: zawtunit@gmail.com</p>
-        </div>
-      )}
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
     </div>
   );
 }
