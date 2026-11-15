@@ -520,10 +520,12 @@ function TvDisplay({ donors, error }) {
                           {donor.dedication && <p>{donor.dedication}</p>}
                         </article>
                       ))
+                    ) : total ? (
+                      <p className="cm-tv-no-donor">—</p>
                     ) : (
-                      <p className="cm-tv-no-donor">
-                        {total ? "—" : "အလှူရှင်စာရင်း မရှိသေးပါ"}
-                      </p>
+                      <article>
+                        <h3 lang="my">ချမ်းမြေ့အဖွဲ့ဝင်များ အလှူ</h3>
+                      </article>
                     )}
                   </td>
                 </tr>
