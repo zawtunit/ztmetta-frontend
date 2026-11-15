@@ -1,0 +1,128 @@
+export const STORAGE_KEY = "chanmyay.donors.v1";
+export const CATEGORIES = [
+  { id: "breakfast", label: "Breakfast", myanmar: "နံနက်ဆွမ်း", icon: "☀" },
+  { id: "lunch", label: "Lunch", myanmar: "နေ့ဆွမ်း", icon: "◒" },
+  { id: "water", label: "Drinking water", myanmar: "သောက်ရေ", icon: "◇" },
+  { id: "drinks", label: "Drinks", myanmar: "အအေး", icon: "♧" },
+];
+export function singaporeDate(now = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Singapore",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const get = (type) => parts.find((part) => part.type === type).value;
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+export function formatDate(date, options = {}) {
+  return new Intl.DateTimeFormat("en-SG", {
+    day: "numeric",
+    month: "short",
+    ...options,
+    timeZone: "Asia/Singapore",
+  }).format(new Date(`${date}T12:00:00+08:00`));
+}
+function validDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return (
+    Number.isFinite(parsed.getTime()) &&
+    parsed.toISOString().slice(0, 10) === value
+  );
+}
+export function validateDonor(donor) {
+  if (!donor.name.trim() || donor.name.length > 160)
+    return "Enter a donor display name of up to 160 characters.";
+  if (!validDate(donor.startDate) || !validDate(donor.endDate))
+    return "Choose valid offering dates.";
+  if (donor.endDate < donor.startDate)
+    return "The end date must be on or after the start date.";
+  if (
+    !donor.categories.length ||
+    donor.categories.some(
+      (id) => !CATEGORIES.some((category) => category.id === id),
+    )
+  )
+    return "Select at least one offering.";
+  if (!["Pending", "Approved", "Cancelled"].includes(donor.status))
+    return "Select a valid status.";
+  if (donor.dedication.length > 300 || donor.phone.length > 40)
+    return "The dedication or phone number is too long.";
+  return "";
+}
+export function onDate(donor, date) {
+  return donor.startDate <= date && donor.endDate >= date;
+}
+export function tvPages(donors, date) {
+  const pages = [];
+  CATEGORIES.forEach((category) => {
+    const matches = donors.filter(
+      (donor) =>
+        donor.status === "Approved" &&
+        onDate(donor, date) &&
+        donor.categories.includes(category.id),
+    );
+    for (let i = 0; i < matches.length; i += 4)
+      pages.push({ category, donors: matches.slice(i, i + 4) });
+  });
+  return pages;
+}
+export function readDonors() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return [];
+  const donors = JSON.parse(raw);
+  if (
+    !Array.isArray(donors) ||
+    donors.some(
+      (donor) =>
+        !donor ||
+        typeof donor.id !== "string" ||
+        typeof donor.name !== "string" ||
+        typeof donor.phone !== "string" ||
+        typeof donor.dedication !== "string" ||
+        !Array.isArray(donor.categories) ||
+        validateDonor(donor),
+    )
+  )
+    throw new Error(
+      "Saved records could not be read. Please recover them before adding more.",
+    );
+  return donors;
+}
+export function donorCsv(donors) {
+  const cell = (value) => {
+    let text = String(value ?? "");
+    if (/^[\s]*[=+@-]/.test(text)) text = `'${text}`;
+    return `"${text.replaceAll('"', '""')}"`;
+  };
+  return (
+    "\uFEFF" +
+    [
+      [
+        "Donor",
+        "Start date",
+        "End date",
+        "Offerings",
+        "Dedication",
+        "Phone",
+        "Status",
+        "Updated",
+      ],
+      ...donors.map((donor) => [
+        donor.name,
+        donor.startDate,
+        donor.endDate,
+        donor.categories
+          .map((id) => CATEGORIES.find((category) => category.id === id).label)
+          .join(", "),
+        donor.dedication,
+        donor.phone,
+        donor.status,
+        donor.updatedAt,
+      ]),
+    ]
+      .map((row) => row.map(cell).join(","))
+      .join("\r\n")
+  );
+}

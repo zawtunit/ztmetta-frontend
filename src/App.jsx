@@ -1,4 +1,5 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
+import Chanmyay from "./chanmyay/Chanmyay.jsx";
 
 function Home() {
   return (
@@ -28,12 +29,15 @@ function Contact() {
 }
 
 function App() {
+  const { pathname } = useLocation();
+  if (pathname === "/chanmyay" || pathname.startsWith("/chanmyay/")) {
+    return <Chanmyay />;
+  }
   return (
     <div>
       {/* Navigation */}
       <div style={{ marginBottom: "20px" }}>
-        <Link to="/">Home</Link> |{" "}
-        <Link to="/about">About</Link> |{" "}
+        <Link to="/">Home</Link> | <Link to="/about">About</Link> |{" "}
         <Link to="/contact">Contact</Link>
       </div>
 
