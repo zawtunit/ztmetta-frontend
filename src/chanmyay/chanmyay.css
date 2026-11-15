@@ -1438,3 +1438,44 @@ svg.cm-tv-emblem {
     width: 32%;
   }
 }
+
+/* Daily register: columns on wider screens and date cards on phones. */
+.cm-daily-mobile { display: none; }
+.cm-app .cm-daily-table { table-layout: fixed; min-width: 0; }
+.cm-app .cm-daily-table th, .cm-app .cm-daily-table td { padding: 16px 14px; vertical-align: top; overflow-wrap: anywhere; }
+.cm-app .cm-daily-table thead th { font-size: 12px; color: #47644c; letter-spacing: 0; font-weight: 650; }
+.cm-app .cm-daily-table th:first-child { width: 115px; }
+.cm-app .cm-daily-table tbody th { font-size: 12px; letter-spacing: 0; color: #456044; }
+.cm-donor-names { display: grid; gap: 12px; }
+.cm-donor-entry { display: block; width: 100%; border: 1px solid #e1e8db; background: #fafcf7; padding: 12px; color: #304c39; text-align: left; min-height: 44px; overflow-wrap: anywhere; }
+.cm-donor-entry:hover { border-color: #8ca280; background: #f0f5eb; }
+.cm-donor-entry strong { display: block; font-size: 14px; line-height: 1.9; white-space: pre-wrap; }
+.cm-daily-dedication { display: block; font-size: 12px; line-height: 1.8; white-space: pre-wrap; margin: 4px 0 8px; color: #64745e; }
+.cm-donor-entry .cm-status { margin-top: 8px; font-size: 10px; }
+.cm-no-offering { color: #a0aa98; }
+.cm-date-pagination { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 16px; font-size: 12px; }
+@media (min-width: 761px) and (max-width: 1100px) {
+  .cm-sidebar { width: 175px; }
+  .cm-workspace { margin-left: 175px; width: calc(100% - 175px); }
+  .cm-main { padding-left: 14px; padding-right: 14px; }
+  .cm-brand { margin-left: 0; gap: 6px; }
+  .cm-brand > span:last-child { font-size: 20px; }
+  .cm-sidebar nav button, .cm-sidebar nav > a { padding-left: 8px; gap: 8px; }
+  .cm-app .cm-daily-table th, .cm-app .cm-daily-table td { padding: 12px 7px; }
+  .cm-app .cm-daily-table th:first-child { width: 90px; }
+  .cm-donor-entry { padding: 8px; }
+}
+@media (max-width: 760px) {
+  .cm-daily-desktop { display: none; }
+  .cm-daily-mobile { display: grid; gap: 14px; padding: 0 14px 14px; }
+  .cm-day-card { border: 1px solid #dfe7d8; border-radius: 9px; overflow: hidden; }
+  .cm-day-card h3 { padding: 13px 14px; background: #edf3e7; font-size: 16px; color: #36583e; }
+  .cm-day-card dl { margin: 0; padding: 0 14px; }
+  .cm-day-card dl > div { padding: 14px 0; border-top: 1px solid #edf0e8; }
+  .cm-day-card dt { font-size: 13px; font-weight: 650; margin-bottom: 8px; color: #59734f; }
+  .cm-day-card dd { margin: 0; }
+  .cm-donor-entry strong { font-size: 16px; }
+  .cm-date-pagination { flex-wrap: wrap; font-size: 10px; }
+  .cm-date-pagination .cm-button { padding: 10px; font-size: 11px; }
+  .cm-page-heading > .cm-button { margin-top: 0; min-height: 44px; }
+}

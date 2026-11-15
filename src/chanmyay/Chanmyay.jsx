@@ -10,6 +10,7 @@ import {
   onDate,
   tvPages,
   donorCsv,
+  dailyOfferings,
 } from "./donors.js";
 import "./chanmyay.css";
 
@@ -487,8 +488,8 @@ function TvDisplay({ donors, error }) {
                         {
                           breakfast: "အရုဏ်ဆွမ်းအလှူ",
                           lunch: "နေ့ဆွမ်းအလှူ",
-                          water: "သောက်ရေသန့်အလှူ",
-                          drinks: "အအေးအလှူ",
+                          water: "သောက်ရေ / အအေးအလှူ",
+                          rental: "ကျောင်းငှားခ / မီးဖိုးအလှူ",
                         }[category.id]
                       }
                     </span>
@@ -529,6 +530,16 @@ function TvDisplay({ donors, error }) {
     </main>
   );
 }
+function OfferingNames({ donors, onEdit }) {
+  if (!donors.length) return <span className="cm-no-offering">—</span>;
+  return <div className="cm-donor-names">{donors.map((donor) =>
+    <button key={donor.id} className="cm-donor-entry" onClick={() => onEdit(donor)} aria-label={`Edit offering for ${donor.name}`}>
+      <strong>{donor.name}</strong>
+      {donor.dedication && <span className="cm-daily-dedication">{donor.dedication}</span>}
+      <span className={`cm-status ${donor.status.toLowerCase()}`}>{donor.status}</span>
+    </button>
+  )}</div>;
+}
 export default function Chanmyay() {
   const location = useLocation();
   const { donors, error, save } = useDonors();
@@ -538,6 +549,7 @@ export default function Chanmyay() {
   const [status, setStatus] = useState("All statuses");
   const [dateFilter, setDateFilter] = useState("all");
   const [notice, setNotice] = useState("");
+  const [datePages, setDatePages] = useState([]);
   const [today, setToday] = useState(singaporeDate());
   useEffect(() => {
     const oldTitle = document.title;
@@ -550,13 +562,7 @@ export default function Chanmyay() {
   }, []);
   if (location.pathname === "/chanmyay/tv")
     return <TvDisplay donors={donors} error={error} />;
-  const approvedToday = donors.filter(
-    (donor) => donor.status === "Approved" && onDate(donor, today),
-  );
   const pending = donors.filter((donor) => donor.status === "Pending");
-  const upcoming = donors.filter(
-    (donor) => donor.status === "Approved" && donor.startDate > today,
-  );
   const filtered = donors
     .filter(
       (donor) =>
@@ -569,8 +575,11 @@ export default function Chanmyay() {
     )
     .sort(
       (a, b) =>
-        a.startDate.localeCompare(b.startDate) || a.name.localeCompare(b.name),
+        b.startDate.localeCompare(a.startDate) || a.name.localeCompare(b.name),
     );
+  const dailyRows = dailyOfferings(filtered, { today, dateFilter, before: datePages.at(-1), limit: 31 });
+  const visibleRows = dailyRows.slice(0, 30);
+  function resetPages(update) { setDatePages([]); update(); }
   const module = futureModules.find((item) => item.id === view);
   function download() {
     const blob = new Blob([donorCsv(filtered)], {
@@ -715,21 +724,7 @@ export default function Chanmyay() {
             <>
               <div className="cm-page-heading">
                 <div>
-                  <span className="cm-eyebrow">
-                    {view === "overview"
-                      ? "CARE THROUGH GENEROSITY"
-                      : "OFFERINGS & DEDICATIONS"}
-                  </span>
-                  <h1>
-                    {view === "overview"
-                      ? "Welcome to Chanmyay."
-                      : "Donor register"}
-                  </h1>
-                  <p>
-                    {view === "overview"
-                      ? "A little organisation. More time for what matters."
-                      : "Manage offerings, upcoming dates and the names shared on TV."}
-                  </p>
+                  <h1>Donor register</h1>
                 </div>
                 <button
                   className="cm-button primary"
@@ -740,93 +735,6 @@ export default function Chanmyay() {
                   Add offering
                 </button>
               </div>
-              <div className="cm-stats">
-                <article>
-                  <span>
-                    Today’s donors
-                    <Icon name="heart" />
-                  </span>
-                  <strong>{approvedToday.length}</strong>
-                  <small>Approved offering records</small>
-                </article>
-                <article>
-                  <span>
-                    Awaiting approval
-                    <Icon name="check" />
-                  </span>
-                  <strong>{pending.length}</strong>
-                  <small>Review before showing on TV</small>
-                </article>
-                <article>
-                  <span>
-                    Upcoming offerings
-                    <Icon name="calendar" />
-                  </span>
-                  <strong>{upcoming.length}</strong>
-                  <small>Approved · starting after today</small>
-                </article>
-                <article className="cm-stat-date">
-                  <span>
-                    Today in Singapore
-                    <Icon name="calendar" />
-                  </span>
-                  <strong>{formatDate(today)}</strong>
-                  <small>
-                    {
-                      formatDate(today, {
-                        weekday: "long",
-                        year: "numeric",
-                      }).split(",")[0]
-                    }{" "}
-                    · SGT
-                  </small>
-                </article>
-              </div>
-              {view === "overview" && (
-                <section className="cm-today-panel">
-                  <div className="cm-today-intro">
-                    <span className="cm-eyebrow">
-                      A DAILY EXPRESSION OF GRATITUDE
-                    </span>
-                    <h2>Today’s offerings</h2>
-                    <p>
-                      Names of approved donors appear on the TV throughout their
-                      offering dates.
-                    </p>
-                    <Link
-                      to="/chanmyay/tv"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="cm-button secondary"
-                    >
-                      <Icon name="tv" />
-                      Open TV display
-                      <Icon name="arrow" />
-                    </Link>
-                  </div>
-                  <div className="cm-offering-grid">
-                    {CATEGORIES.map((category) => {
-                      const matches = approvedToday.filter((donor) =>
-                        donor.categories.includes(category.id),
-                      );
-                      return (
-                        <article key={category.id}>
-                          <span className={`cm-category-icon ${category.id}`}>
-                            {category.icon}
-                          </span>
-                          <h3>{category.label}</h3>
-                          <span lang="my">{category.myanmar}</span>
-                          <p>
-                            {matches.length
-                              ? `${matches.length} ${matches.length === 1 ? "donor" : "donors"}`
-                              : "No offering scheduled"}
-                          </p>
-                        </article>
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
               <section className="cm-register">
                 <div className="cm-register-heading">
                   <div>
@@ -836,7 +744,7 @@ export default function Chanmyay() {
                         : "All offerings"}
                       <span>{donors.length}</span>
                     </h2>
-                    <p>Keep every offering and its dedication together.</p>
+                    <p>Newest dates first · Select a donor to edit their offering.</p>
                   </div>
                   <button
                     className="cm-button secondary"
@@ -854,13 +762,13 @@ export default function Chanmyay() {
                       aria-label="Search donor names"
                       placeholder="Search donor names…"
                       value={search}
-                      onChange={(event) => setSearch(event.target.value)}
+                      onChange={(event) => resetPages(() => setSearch(event.target.value))}
                     />
                   </label>
                   <select
                     aria-label="Filter by status"
                     value={status}
-                    onChange={(event) => setStatus(event.target.value)}
+                    onChange={(event) => resetPages(() => setStatus(event.target.value))}
                   >
                     <option>All statuses</option>
                     <option>Pending</option>
@@ -870,81 +778,37 @@ export default function Chanmyay() {
                   <select
                     aria-label="Filter by offering date"
                     value={dateFilter}
-                    onChange={(event) => setDateFilter(event.target.value)}
+                    onChange={(event) => resetPages(() => setDateFilter(event.target.value))}
                   >
                     <option value="all">All dates</option>
                     <option value="today">Today</option>
                     <option value="upcoming">Today & upcoming</option>
                   </select>
                 </div>
-                <div className="cm-table-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>DONOR</th>
-                        <th>OFFERING</th>
-                        <th>DATES</th>
-                        <th>STATUS</th>
-                        <th>
-                          <span className="cm-sr-only">Actions</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map((donor) => (
-                        <tr key={donor.id}>
-                          <td>
-                            <strong>{donor.name}</strong>
-                            {donor.dedication && (
-                              <small className="cm-dedication">
-                                {donor.dedication}
-                              </small>
-                            )}
-                          </td>
-                          <td>
-                            <div className="cm-tags">
-                              {donor.categories.map((id) => (
-                                <span key={id}>
-                                  {
-                                    CATEGORIES.find(
-                                      (category) => category.id === id,
-                                    ).label
-                                  }
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-                          <td className="cm-dates">
-                            {formatDate(donor.startDate, { year: "numeric" })}
-                            {donor.startDate !== donor.endDate && (
-                              <small>
-                                through{" "}
-                                {formatDate(donor.endDate, { year: "numeric" })}
-                              </small>
-                            )}
-                          </td>
-                          <td>
-                            <span
-                              className={`cm-status ${donor.status.toLowerCase()}`}
-                            >
-                              {donor.status}
-                            </span>
-                          </td>
-                          <td>
-                            <button
-                              className="cm-edit"
-                              onClick={() => setEditing(donor)}
-                              aria-label={`Edit offering for ${donor.name}`}
-                            >
-                              Edit ↗
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                <div className="cm-table-scroll cm-daily-desktop">
+                  <table className="cm-daily-table">
+                    <caption className="cm-sr-only">Daily offerings, newest dates first</caption>
+                    <thead><tr><th scope="col">Date ↓</th>{CATEGORIES.map((category) => <th scope="col" key={category.id}>{category.label}</th>)}</tr></thead>
+                    <tbody>{visibleRows.map((row) => <tr key={row.date}>
+                      <th scope="row"><time dateTime={row.date}>{formatDate(row.date, { year: "numeric" })}</time></th>
+                      {CATEGORIES.map((category) => <td key={category.id}><OfferingNames donors={row.donors.filter((donor) => donor.categories.includes(category.id))} onEdit={setEditing} /></td>)}
+                    </tr>)}</tbody>
                   </table>
                 </div>
-                {!filtered.length && (
+                <div className="cm-daily-mobile">
+                  {visibleRows.map((row) => <article className="cm-day-card" key={row.date}>
+                    <h3><time dateTime={row.date}>{formatDate(row.date, { weekday: "short", year: "numeric" })}</time></h3>
+                    <dl>{CATEGORIES.map((category) => <div key={category.id}>
+                      <dt>{category.label}</dt><dd><OfferingNames donors={row.donors.filter((donor) => donor.categories.includes(category.id))} onEdit={setEditing} /></dd>
+                    </div>)}</dl>
+                  </article>)}
+                </div>
+                {(datePages.length > 0 || dailyRows.length > 30) && <div className="cm-date-pagination">
+                  <button className="cm-button secondary" disabled={!datePages.length} onClick={() => setDatePages((pages) => pages.slice(0, -1))}>← Newer dates</button>
+                  <span>Page {datePages.length + 1}</span>
+                  <button className="cm-button secondary" disabled={dailyRows.length <= 30} onClick={() => setDatePages((pages) => [...pages, visibleRows.at(-1).date])}>Older dates →</button>
+                </div>}
+                {!visibleRows.length && (
                   <div className="cm-empty">
                     <span className="cm-feature-icon">
                       <Icon name="heart" width="28" height="28" />
@@ -971,26 +835,6 @@ export default function Chanmyay() {
                   </div>
                 )}
               </section>
-              {view === "overview" && (
-                <div className="cm-roadmap">
-                  <div>
-                    <span className="cm-eyebrow">ROOM TO GROW</span>
-                    <h2>A home for the centre’s daily work.</h2>
-                  </div>
-                  <div>
-                    {futureModules.map((item) => (
-                      <button key={item.id} onClick={() => setView(item.id)}>
-                        <Icon name={item.icon} />
-                        <span>
-                          {item.name}
-                          <small>Planned</small>
-                        </span>
-                        <Icon name="arrow" width="16" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </>
           )}
           <footer className="cm-footer">

@@ -2,8 +2,8 @@ export const STORAGE_KEY = "chanmyay.donors.v1";
 export const CATEGORIES = [
   { id: "breakfast", label: "Breakfast", myanmar: "နံနက်ဆွမ်း", icon: "☀" },
   { id: "lunch", label: "Lunch", myanmar: "နေ့ဆွမ်း", icon: "◒" },
-  { id: "water", label: "Drinking water", myanmar: "သောက်ရေ", icon: "◇" },
-  { id: "drinks", label: "Drinks", myanmar: "အအေး", icon: "♧" },
+  { id: "water", label: "Water/Drink", myanmar: "သောက်ရေ / အအေး", icon: "◇" },
+  { id: "rental", label: "Rental/Electric", myanmar: "ကျောင်းငှားခ / မီးဖိုး", icon: "⌂" },
 ];
 export function singaporeDate(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-GB", {
@@ -79,7 +79,12 @@ export function tvPages(donors, date) {
 export function readDonors() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return [];
-  const donors = JSON.parse(raw);
+  const parsed = JSON.parse(raw);
+  const donors = Array.isArray(parsed) ? parsed.map((donor) =>
+    donor && Array.isArray(donor.categories)
+      ? { ...donor, categories: [...new Set(donor.categories.map((id) => id === "drinks" ? "water" : id))] }
+      : donor
+  ) : parsed;
   if (
     !Array.isArray(donors) ||
     donors.some(
@@ -133,4 +138,31 @@ export function donorCsv(donors) {
       .map((row) => row.map(cell).join(","))
       .join("\r\n")
   );
+}
+
+// Generate a bounded page of donation dates, skipping gaps between bookings.
+export function dailyOfferings(donors, { today, dateFilter = "all", before, limit = 30 } = {}) {
+  const previousDate = (date) => {
+    const value = new Date(`${date}T12:00:00Z`);
+    value.setUTCDate(value.getUTCDate() - 1);
+    return value.toISOString().slice(0, 10);
+  };
+  const ranges = donors.map((donor) => ({
+    donor,
+    start: dateFilter === "all" ? donor.startDate : donor.startDate > today ? donor.startDate : today,
+    end: dateFilter === "today" && donor.endDate > today ? today : donor.endDate,
+  })).filter(({ start, end }) => start <= end);
+  const rows = [];
+  let ceiling = before ? previousDate(before) : "9999-12-31";
+  while (rows.length < limit) {
+    const candidates = ranges.filter(({ start }) => start <= ceiling);
+    if (!candidates.length) break;
+    const date = candidates.reduce((latest, { end }) => {
+      const value = end < ceiling ? end : ceiling;
+      return value > latest ? value : latest;
+    }, "");
+    rows.push({ date, donors: ranges.filter(({ start, end }) => start <= date && end >= date).map(({ donor }) => donor) });
+    ceiling = previousDate(date);
+  }
+  return rows;
 }

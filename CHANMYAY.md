@@ -20,6 +20,9 @@ Open the local address printed by Vite, then append `/chanmyay` for the dashboar
 - A single offering date or an inclusive date range.
 - Pending, Approved and Cancelled states. Public submissions and real authentication are not implemented.
 - Myanmar/English donor names and optional dedications.
+- Daily register with newest dates first: Breakfast, Lunch, Water/Drink, Rental/Electric.
+- Desktop category columns and stacked daily cards on phones. Multi-day bookings appear on every applicable date; date pages contain up to 30 days.
+- Existing Water and Drinks bookings combine automatically without duplicate names for a single booking.
 - Phone kept off the TV output.
 - Singapore date selection, including midnight rollover.
 - A four-row Myanmar/English TV table with a generated lotus-pond background. Each category shows up to two donors per page, with additional pages rotating every 12 seconds. Decorative Dhamma wheels are used beside the heading pending the original centre logo.
