@@ -1533,3 +1533,28 @@ svg.cm-tv-emblem {
 
 .cm-tv-presenting .cm-tv-tools { display: none; }
 .cm-tv-exit { display: block; margin: 12px auto 0; padding: 7px 12px; border: 1px solid #a9bb95; background: #ffffffb8; color: #3b6131; font-size: 11px; }
+
+.cm-display-settings, .cm-import-records { border: 1px solid #dfe7d8; background: #fff; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
+.cm-display-settings label { display: block; font-size: 13px; font-weight: 650; color: #3d5b43; margin-bottom: 8px; }
+.cm-display-settings-row { display: flex; gap: 10px; }
+.cm-display-settings input, .cm-login-card input { font: inherit; font-size: 16px; color: #2b4935; padding: 10px 12px; border: 1px solid #cedbc6; border-radius: 7px; min-width: 0; width: 100%; background: #fcfdf9; }
+.cm-display-settings .cm-button { flex-shrink: 0; }
+.cm-display-settings p { font-size: 11px; color: #6d7d61; margin-top: 8px; }
+.cm-display-settings .cm-settings-success { color: #365d3f; }
+.cm-import-records p { font-size: 12px; margin-bottom: 12px; }
+.cm-login-page { align-items: center; justify-content: center; padding: 24px; }
+.cm-login-card { width: 440px; max-width: 100%; padding: 32px; border: 1px solid #dfe7d8; border-radius: 14px; background: #fff; }
+.cm-login-card p { font-size: 13px; margin: 16px 0; }
+.cm-login-card label { display: block; font-size: 13px; margin: 18px 0; }
+.cm-login-card input { display: block; margin-top: 6px; }
+.cm-login-card .cm-text-button { display: inline-block; margin-top: 20px; }
+.cm-login-card button { min-height: 44px; }
+@media (max-width: 760px) {
+  .cm-display-settings, .cm-import-records { padding: 16px; }
+  .cm-display-settings-row { flex-wrap: wrap; }
+  .cm-display-settings-row .cm-button { width: 100%; min-height: 44px; justify-content: center; }
+  .cm-login-page { display: flex; }
+  .cm-login-card { padding: 24px; }
+  .cm-tv h1 { overflow-wrap: anywhere; }
+}
+.cm-tv h1 { white-space: pre-line; overflow-wrap: anywhere; }

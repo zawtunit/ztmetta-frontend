@@ -2,11 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   CATEGORIES,
-  STORAGE_KEY,
   singaporeDate,
   formatDate,
   validateDonor,
-  readDonors,
   onDate,
   tvPages,
   donorCsv,
@@ -14,6 +12,8 @@ import {
   validDate,
 } from "./donors.js";
 import "./chanmyay.css";
+import { useRegister } from "./useRegister.js";
+import { AdministratorLogin, DisplaySettings, ImportBrowserRecords } from "./RegisterControls.jsx";
 
 function Icon({ name, ...props }) {
   const paths = {
@@ -90,49 +90,6 @@ function Icon({ name, ...props }) {
     </svg>
   );
 }
-function useDonors() {
-  const [state, setState] = useState(() => {
-    try {
-      return { donors: readDonors(), error: "" };
-    } catch (error) {
-      return { donors: [], error: error.message };
-    }
-  });
-  useEffect(() => {
-    const update = (event) => {
-      if (event.key !== STORAGE_KEY && event.key !== null) return;
-      try {
-        setState({ donors: readDonors(), error: "" });
-      } catch (error) {
-        setState((previous) => ({ ...previous, error: error.message }));
-      }
-    };
-    window.addEventListener("storage", update);
-    return () => window.removeEventListener("storage", update);
-  }, []);
-  const save = (donor) => {
-    try {
-      const current = readDonors();
-      const previous = current.find((item) => item.id === donor.id);
-      if (donor.updatedAt && previous?.updatedAt !== donor.updatedAt)
-        return "This record changed in another tab. Close this form and reopen the record.";
-      const updated = {
-        ...donor,
-        updatedAt: new Date().toISOString(),
-        createdAt: previous?.createdAt || new Date().toISOString(),
-      };
-      const next = previous
-        ? current.map((item) => (item.id === donor.id ? updated : item))
-        : [...current, updated];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      setState({ donors: next, error: "" });
-      return "";
-    } catch (error) {
-      return `Could not save. ${error.message}`;
-    }
-  };
-  return { ...state, save };
-}
 const futureModules = [
   {
     id: "events",
@@ -173,6 +130,7 @@ function DonorForm({ donor, onClose, onSave }) {
     },
   );
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
   const [range, setRange] = useState(
     Boolean(donor && donor.startDate !== donor.endDate),
   );
@@ -190,7 +148,7 @@ function DonorForm({ donor, onClose, onSave }) {
   }, [onClose]);
   const change = (field, value) =>
     setForm((previous) => ({ ...previous, [field]: value }));
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
     const value = {
       ...form,
@@ -199,9 +157,15 @@ function DonorForm({ donor, onClose, onSave }) {
       dedication: form.dedication.trim(),
       endDate: range ? form.endDate : form.startDate,
     };
-    const message = validateDonor(value) || onSave(value);
-    if (message) setError(message);
-    else onClose();
+    const invalid = validateDonor(value);
+    if (invalid) { setError(invalid); return; }
+    setSaving(true);
+    try {
+      const message = await onSave(value);
+      if (message) setError(message);
+      else onClose();
+    } catch (error) { setError(error.message); }
+    finally { setSaving(false); }
   };
   return (
     <div className="cm-overlay">
@@ -393,9 +357,9 @@ function DonorForm({ donor, onClose, onSave }) {
             >
               Cancel
             </button>
-            <button className="cm-button primary" type="submit">
+            <button className="cm-button primary" type="submit" disabled={saving}>
               <Icon name="check" />
-              Save offering
+              {saving ? "Saving…" : "Save offering"}
             </button>
           </div>
         </form>
@@ -403,8 +367,7 @@ function DonorForm({ donor, onClose, onSave }) {
     </div>
   );
 }
-function TvDisplay({ donors, error }) {
-  const [today, setToday] = useState(singaporeDate());
+function TvDisplay({ donors, error, settings, mode, loading, today }) {
   const [index, setIndex] = useState(0);
   const [presenting, setPresenting] = useState(false);
   function showControls() {
@@ -436,7 +399,6 @@ function TvDisplay({ donors, error }) {
   }
   useEffect(() => {
     const timer = setInterval(() => {
-      setToday(singaporeDate());
       setIndex((value) => value + 1);
     }, 12000);
     return () => clearInterval(timer);
@@ -475,7 +437,7 @@ function TvDisplay({ donors, error }) {
         </svg>
         <div>
           <p>CHANMYAY YEIKTHA MEDITATION CENTRE (SINGAPORE)</p>
-          <h1 lang="my">{displayDate === today ? "ယနေ့ အလှူရှင်များ" : "အလှူရှင်များ"}</h1>
+          <h1 lang={settings.eventName ? undefined : "my"}>{settings.eventName || (displayDate === today ? "ယနေ့ အလှူရှင်များ" : "အလှူရှင်များ")}</h1>
           <h2>Daily offerings &amp; dedications</h2>
           <div className="cm-tv-date">
             {formatDate(displayDate, {
@@ -493,7 +455,7 @@ function TvDisplay({ donors, error }) {
           ))}
         </svg>
       </header>
-      {error ? (
+      {loading ? <p role="status">Loading offerings…</p> : error ? (
         <p role="alert" className="cm-error">
           {error}
         </p>
@@ -557,7 +519,7 @@ function TvDisplay({ donors, error }) {
             seconds
           </div>
         )}
-        <small>Preview · Records from this browser only · Singapore time{requestedDate && " · Fixed date selected"}</small>
+        <small>{mode === "shared" ? "Shared display · Updates every 20 seconds" : "Preview · Records from this browser only"} · Singapore time{requestedDate && " · Fixed date selected"}</small>
         {presenting && <button className="cm-tv-exit" onClick={showControls}>Show controls</button>}
       </footer>
     </main>
@@ -575,7 +537,8 @@ function OfferingNames({ donors, onEdit }) {
 }
 export default function Chanmyay() {
   const location = useLocation();
-  const { donors, error, save } = useDonors();
+  const isTv = location.pathname === "/chanmyay/tv";
+  const requestedDate = new URLSearchParams(location.search).get("date") || "";
   const [view, setView] = useState("overview");
   const [editing, setEditing] = useState(undefined);
   const [search, setSearch] = useState("");
@@ -584,6 +547,8 @@ export default function Chanmyay() {
   const [notice, setNotice] = useState("");
   const [datePages, setDatePages] = useState([]);
   const [today, setToday] = useState(singaporeDate());
+  const register = useRegister(isTv, validDate(requestedDate) ? requestedDate : today);
+  const { donors, error, save, settings, loading, mode } = register;
   useEffect(() => {
     const oldTitle = document.title;
     document.title = "Chanmyay · Centre management";
@@ -593,8 +558,8 @@ export default function Chanmyay() {
       clearInterval(timer);
     };
   }, []);
-  if (location.pathname === "/chanmyay/tv")
-    return <TvDisplay donors={donors} error={error} />;
+  if (isTv) return <TvDisplay donors={donors} error={error} settings={settings} mode={mode} loading={loading} today={today} />;
+  if (mode === "shared" && (!register.ready || !register.isAdmin)) return <AdministratorLogin register={register} />;
   const pending = donors.filter((donor) => donor.status === "Pending");
   const filtered = donors
     .filter(
@@ -674,7 +639,7 @@ export default function Chanmyay() {
         </nav>
         <div className="cm-sidebar-bottom">
           <span className="cm-status-dot" />
-          First release preview
+          {mode === "shared" ? "Shared centre workspace" : "First release preview"}
           <p>
             A thoughtful space to care for
             <br />
@@ -696,7 +661,8 @@ export default function Chanmyay() {
             </strong>
           </div>
           <div className="cm-top-right">
-            <span className="cm-preview-badge">WORKFLOW PREVIEW</span>
+            <span className="cm-preview-badge">{mode === "shared" ? "ADMINISTRATOR" : "WORKFLOW PREVIEW"}</span>
+            {mode === "shared" && <button className="cm-button secondary" onClick={async () => { const result = await register.signOut(); if (result) setNotice(result); }}>Sign out</button>}
             <span className="cm-avatar">CM</span>
           </div>
         </header>
@@ -704,8 +670,7 @@ export default function Chanmyay() {
           <div className="cm-storage-notice">
             <span className="cm-status-dot" />
             <span>
-              Preview mode · Saved on this browser only. Shared database and
-              staff sign-in are the next setup step.
+              {mode === "shared" ? "Shared database · Administrator access · TV updates every 20 seconds." : "Preview mode · Saved on this browser only. Shared database connection is pending."}
             </span>
           </div>
           {error && (
@@ -761,13 +726,16 @@ export default function Chanmyay() {
                 </div>
                 <button
                   className="cm-button primary"
-                  disabled={Boolean(error)}
+                  disabled={Boolean(error) || loading}
                   onClick={() => setEditing(null)}
                 >
                   <Icon name="plus" />
                   Add offering
                 </button>
               </div>
+              <DisplaySettings settings={settings} onSave={register.saveSettings} disabled={Boolean(error) || loading} />
+              {mode === "shared" && <ImportBrowserRecords onImport={register.importLocal} />}
+              {loading && <p role="status">Loading offerings…</p>}
               <section className="cm-register">
                 <div className="cm-register-heading">
                   <div>
@@ -852,7 +820,7 @@ export default function Chanmyay() {
                   <span>Page {datePages.length + 1}</span>
                   <button className="cm-button secondary" disabled={dailyRows.length <= 30} onClick={() => setDatePages((pages) => [...pages, visibleRows.at(-1).date])}>Older dates →</button>
                 </div>}
-                {!visibleRows.length && (
+                {!loading && !error && !visibleRows.length && (
                   <div className="cm-empty">
                     <span className="cm-feature-icon">
                       <Icon name="heart" width="28" height="28" />
@@ -870,7 +838,7 @@ export default function Chanmyay() {
                     {!donors.length && (
                       <button
                         className="cm-text-button"
-                        disabled={Boolean(error)}
+                        disabled={Boolean(error) || loading}
                         onClick={() => setEditing(null)}
                       >
                         Add your first offering <Icon name="arrow" />
@@ -892,8 +860,8 @@ export default function Chanmyay() {
           key={editing?.id || "new"}
           donor={editing}
           onClose={() => setEditing(undefined)}
-          onSave={(value) => {
-            const result = save(value);
+          onSave={async (value) => {
+            const result = await save(value);
             if (!result)
               setNotice(
                 "Offering saved. Approved records appear on the TV on their scheduled dates.",
