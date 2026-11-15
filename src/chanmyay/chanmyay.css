@@ -955,7 +955,7 @@
   height: auto;
 }
 .cm-donation-header > div > p {
-  font-size: clamp(13px, 1.65vw, 28px);
+  font-size: clamp(17px, 2vw, 34px);
   font-weight: 750;
   color: #21682b;
   letter-spacing: 0.4px;
@@ -1065,7 +1065,7 @@
   font-size: 11px;
   margin-top: 8px;
 }
-.cm-tv:fullscreen .cm-tv-tools {
+:fullscreen .cm-tv-tools {
   display: none;
 }
 
@@ -1357,7 +1357,8 @@ body:has(.cm-tv) {
     margin-bottom: 18px;
   }
   .cm-donation-header > div > p {
-    font-size: 10px;
+    font-size: 14px;
+    line-height: 1.5;
     letter-spacing: 0;
   }
   .cm-tv h1 {
@@ -1529,3 +1530,6 @@ svg.cm-tv-emblem {
     mask-image: linear-gradient(transparent, #000 35%);
   }
 }
+
+.cm-tv-presenting .cm-tv-tools { display: none; }
+.cm-tv-exit { display: block; margin: 12px auto 0; padding: 7px 12px; border: 1px solid #a9bb95; background: #ffffffb8; color: #3b6131; font-size: 11px; }

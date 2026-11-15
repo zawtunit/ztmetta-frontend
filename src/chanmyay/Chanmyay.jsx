@@ -406,7 +406,23 @@ function DonorForm({ donor, onClose, onSave }) {
 function TvDisplay({ donors, error }) {
   const [today, setToday] = useState(singaporeDate());
   const [index, setIndex] = useState(0);
-  const [fullscreenError, setFullscreenError] = useState("");
+  const [presenting, setPresenting] = useState(false);
+  function showControls() {
+    setPresenting(false);
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      if (!document.fullscreenElement) setPresenting(false);
+    };
+    const onKeyDown = (event) => { if (event.key === "Escape") showControls(); };
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedDate = searchParams.get("date") || "";
   const displayDate = validDate(requestedDate) ? requestedDate : today;
@@ -427,7 +443,7 @@ function TvDisplay({ donors, error }) {
   }, []);
   const page = pages.length ? pages[index % pages.length] : null;
   return (
-    <main className="cm-tv">
+    <main className={`cm-tv${presenting ? " cm-tv-presenting" : ""}`}>
       <div className="cm-tv-tools">
         <Link to="/chanmyay">← Staff dashboard</Link>
         <div className="cm-tv-date-controls">
@@ -438,13 +454,11 @@ function TvDisplay({ donors, error }) {
         </div>
         <button
           onClick={async () => {
+            setPresenting(true);
             try {
-              if (document.fullscreenElement) await document.exitFullscreen();
-              else await document.documentElement.requestFullscreen();
+              if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
             } catch {
-              setFullscreenError(
-                "Use your browser full-screen control to fill the display.",
-              );
+              // Keep the clean presentation layout when native full screen is unavailable.
             }
           }}
         >
@@ -544,7 +558,7 @@ function TvDisplay({ donors, error }) {
           </div>
         )}
         <small>Preview · Records from this browser only · Singapore time{requestedDate && " · Fixed date selected"}</small>
-        {fullscreenError && <p>{fullscreenError}</p>}
+        {presenting && <button className="cm-tv-exit" onClick={showControls}>Show controls</button>}
       </footer>
     </main>
   );
