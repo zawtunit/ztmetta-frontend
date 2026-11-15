@@ -915,160 +915,160 @@
 }
 .cm-tv {
   min-height: 100vh;
-  background: #f3f2e8;
-  padding: 40px 6vw 28px;
+  background: #edf1e6 url("/chanmyay/lotus-background.webp") center / cover
+    fixed;
+  padding: 22px 5vw 20px;
+  color: #183b22;
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-  color: #355340;
 }
 .cm-tv-tools {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  max-width: 1650px;
   font-size: 12px;
-  color: #829275;
+  color: #31593b;
+  margin-bottom: 16px;
 }
+.cm-tv-tools a,
 .cm-tv-tools button {
-  padding: 8px 15px;
-  background: #fff;
-  border: 1px solid #d8dfcd;
-  color: #657d56;
+  background: #ffffffe8;
+  border: 1px solid #9eb690;
+  border-radius: 6px;
+  padding: 7px 12px;
+  color: #31593b;
 }
-.cm-tv header {
+.cm-tv .cm-donation-header {
+  display: grid;
+  grid-template-columns: clamp(60px, 7vw, 110px) 1fr clamp(60px, 7vw, 110px);
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 1650px;
+  margin: 0 0 22px;
   text-align: center;
-  margin: 10px 0 30px;
 }
-.cm-lotus {
-  font-size: 50px;
-  color: #8b9d70;
+.cm-centre-logo {
+  width: 100%;
+  height: auto;
 }
-.cm-tv header > p {
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: #8c987d;
-  margin-bottom: 18px;
+.cm-donation-header > div > p {
+  font-size: clamp(13px, 1.65vw, 28px);
+  font-weight: 750;
+  color: #21682b;
+  letter-spacing: 0.4px;
+  text-shadow: 0 1px 4px #fff;
 }
 .cm-tv h1 {
-  font-family: "Myanmar Text", sans-serif;
-  font-size: clamp(30px, 4vw, 64px);
-  font-weight: 500;
-  line-height: 1.8;
+  font-family: "Myanmar Text", "Noto Sans Myanmar", sans-serif;
+  font-size: clamp(25px, 2.7vw, 46px);
+  font-weight: 700;
+  line-height: 1.7;
+  margin-top: 8px;
+  color: #24662a;
 }
 .cm-tv h2 {
-  font-family: Georgia, serif;
-  font-size: 22px;
-  font-weight: 400;
-  margin-top: 3px;
-  color: #789065;
+  font-size: clamp(12px, 1.1vw, 18px);
+  font-weight: 500;
+  color: #476e40;
 }
 .cm-tv-date {
-  display: inline-block;
-  margin-top: 20px;
-  border-top: 1px solid #d9dfcc;
-  border-bottom: 1px solid #d9dfcc;
-  padding: 9px 30px;
-  color: #8a977b;
-  font-size: 15px;
-}
-.cm-tv-offering {
-  width: 100%;
-  max-width: 1150px;
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  background: #ffffff99;
-  border: 1px solid #dfe5d3;
-  border-radius: 18px;
-  min-height: 290px;
-  margin: auto;
-}
-.cm-tv-category {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #e8eddc;
-  border-radius: 18px 0 0 18px;
-  padding: 25px;
-}
-.cm-tv-category > span {
-  font-size: 45px;
-  color: #98a67c;
-}
-.cm-tv-category h3 {
-  font-size: 26px;
-  margin: 12px 0;
-  line-height: 1.8;
-  font-weight: 500;
-}
-.cm-tv-category p {
-  font:
-    18px Georgia,
-    serif;
-  color: #859571;
-}
-.cm-tv-names {
-  padding: 20px 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.cm-tv-names article {
-  padding: 14px 0;
-}
-.cm-tv-names article + article {
-  border-top: 1px solid #e3e9d9;
-}
-.cm-tv-names h4 {
-  font-size: clamp(24px, 2.7vw, 42px);
-  font-weight: 500;
-  overflow-wrap: anywhere;
-  line-height: 1.65;
-}
-.cm-tv-names article p {
-  font-size: clamp(15px, 1.3vw, 22px);
-  color: #8a9979;
+  font-size: clamp(13px, 1.35vw, 23px);
+  font-weight: 650;
+  color: #28622d;
   margin-top: 8px;
+}
+.cm-donation-board {
+  width: 100%;
+  max-width: 1650px;
+  margin: auto;
+  box-shadow: 0 6px 35px #26452318;
+}
+.cm-donation-table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  background: #ffffd5f2;
+}
+.cm-donation-table th,
+.cm-donation-table td {
+  border: 2px solid #76a55c;
+  padding: 16px 24px;
+  text-align: left;
+  vertical-align: middle;
+}
+.cm-donation-table th {
+  width: 28%;
+  background: #edf2c9ed;
+}
+.cm-donation-table th > span {
+  display: block;
+  font-size: clamp(19px, 2.2vw, 37px);
+  line-height: 1.9;
+  font-weight: 700;
   overflow-wrap: anywhere;
+}
+.cm-donation-table th > small {
+  display: block;
+  color: #466b36;
+  font-size: clamp(11px, 1vw, 17px);
+  font-weight: 500;
+  margin-top: 3px;
+}
+.cm-donation-table article + article {
+  border-top: 1px solid #a9c38a;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+.cm-donation-table h3 {
+  font-size: clamp(22px, 2.5vw, 43px);
+  font-weight: 700;
+  color: #172e19;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.cm-donation-table article p {
+  font-size: clamp(16px, 1.55vw, 27px);
+  color: #30462b;
+  margin-top: 3px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+.cm-tv-no-donor {
+  font-size: clamp(16px, 1.5vw, 25px);
+  line-height: 1.9;
+  color: #627752;
 }
 .cm-tv footer {
   text-align: center;
-  margin-top: 35px;
-  color: #869775;
-  font-size: 14px;
+  padding-top: 16px;
+  color: #3b6131;
+  font-size: 12px;
 }
 .cm-tv footer > span {
   display: block;
-  font-size: 22px;
-  letter-spacing: 6px;
-  margin-top: 12px;
+  font-size: clamp(20px, 1.8vw, 30px);
+  font-weight: 650;
+  letter-spacing: 5px;
+  margin-top: 7px;
 }
 .cm-tv footer small {
-  font-size: 10px;
-  color: #a4ae98;
   display: block;
-  margin-top: 12px;
+  font-size: 9px;
+  margin-top: 6px;
+  color: #526b47;
 }
 .cm-tv-progress {
   font-size: 11px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
-.cm-tv-empty {
-  margin: auto;
-  text-align: center;
-  padding: 60px 20px;
+.cm-tv:fullscreen .cm-tv-tools {
+  display: none;
 }
-.cm-tv-empty h3 {
-  font:
-    30px Georgia,
-    serif;
-}
-.cm-tv-empty p {
-  margin-top: 20px;
-  font-size: 16px;
-  color: #96a286;
-}
+
 body:has(.cm-app),
 body:has(.cm-tv) {
   margin: 0;
@@ -1349,46 +1349,48 @@ body:has(.cm-tv) {
     margin: 20px 0 40px;
   }
   .cm-tv {
-    padding: 20px;
+    padding: 16px 14px;
   }
-  .cm-tv header > p {
-    font-size: 8px;
-    letter-spacing: 1px;
+  .cm-tv .cm-donation-header {
+    grid-template-columns: 42px 1fr 42px;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .cm-donation-header > div > p {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+  .cm-tv h1 {
+    font-size: 24px;
   }
   .cm-tv h2 {
-    font-size: 18px;
-  }
-  .cm-tv-date {
-    font-size: 12px;
-    padding: 9px;
-  }
-  .cm-tv-offering {
-    grid-template-columns: 1fr;
-  }
-  .cm-tv-category {
-    border-radius: 18px 18px 0 0;
-    padding: 15px;
-    flex-direction: row;
-    gap: 14px;
-  }
-  .cm-tv-category > span {
-    font-size: 26px;
-  }
-  .cm-tv-category h3 {
-    font-size: 20px;
-    margin: 0;
-  }
-  .cm-tv-category p {
-    font-size: 16px;
-  }
-  .cm-tv-names {
-    padding: 18px 25px;
-  }
-  .cm-tv footer {
     font-size: 11px;
   }
-  .cm-tv-empty h3 {
-    font-size: 25px;
+  .cm-tv-date {
+    font-size: 11px;
+  }
+  .cm-donation-table th {
+    width: 32%;
+  }
+  .cm-donation-table th,
+  .cm-donation-table td {
+    padding: 12px 10px;
+    border-width: 1px;
+  }
+  .cm-donation-table th > span {
+    font-size: 15px;
+  }
+  .cm-donation-table th > small {
+    font-size: 10px;
+  }
+  .cm-donation-table h3 {
+    font-size: 19px;
+  }
+  .cm-donation-table article p {
+    font-size: 14px;
+  }
+  .cm-tv-no-donor {
+    font-size: 13px;
   }
   .cm-roadmap button {
     font-size: 9px !important;
@@ -1402,4 +1404,37 @@ body:has(.cm-tv) {
 
 .cm-dialog label > .cm-label-text {
   color: #3d5246;
+}
+
+.cm-tv-emblem {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px solid #839d61;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f5f4d9d9;
+  color: #678044;
+  font-size: clamp(32px, 5vw, 80px);
+  line-height: 1;
+}
+@media (max-width: 760px) {
+  .cm-tv-emblem {
+    font-size: 30px;
+  }
+}
+
+.cm-donation-table .cm-offering-column {
+  width: 28%;
+}
+svg.cm-tv-emblem {
+  fill: #f5f4d9d9;
+  stroke: #678044;
+  stroke-width: 2.5;
+  padding: 5px;
+}
+@media (max-width: 760px) {
+  .cm-donation-table .cm-offering-column {
+    width: 32%;
+  }
 }

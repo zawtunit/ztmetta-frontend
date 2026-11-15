@@ -55,18 +55,26 @@ export function onDate(donor, date) {
   return donor.startDate <= date && donor.endDate >= date;
 }
 export function tvPages(donors, date) {
-  const pages = [];
-  CATEGORIES.forEach((category) => {
-    const matches = donors.filter(
+  const groups = CATEGORIES.map((category) => ({
+    category,
+    donors: donors.filter(
       (donor) =>
         donor.status === "Approved" &&
         onDate(donor, date) &&
         donor.categories.includes(category.id),
-    );
-    for (let i = 0; i < matches.length; i += 4)
-      pages.push({ category, donors: matches.slice(i, i + 4) });
-  });
-  return pages;
+    ),
+  }));
+  const pageCount = Math.max(
+    1,
+    ...groups.map((group) => Math.ceil(group.donors.length / 2)),
+  );
+  return Array.from({ length: pageCount }, (_, index) => ({
+    rows: groups.map((group) => ({
+      category: group.category,
+      donors: group.donors.slice(index * 2, index * 2 + 2),
+      total: group.donors.length,
+    })),
+  }));
 }
 export function readDonors() {
   const raw = localStorage.getItem(STORAGE_KEY);

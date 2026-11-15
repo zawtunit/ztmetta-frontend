@@ -22,7 +22,7 @@ Open the local address printed by Vite, then append `/chanmyay` for the dashboar
 - Myanmar/English donor names and optional dedications.
 - Phone kept off the TV output.
 - Singapore date selection, including midnight rollover.
-- TV pages with up to four donors, rotating every 12 seconds.
+- A four-row Myanmar/English TV table with a generated lotus-pond background. Each category shows up to two donors per page, with additional pages rotating every 12 seconds. Decorative Dhamma wheels are used beside the heading pending the original centre logo.
 - TV updates when another tab in the same browser changes an offering.
 - Clearly labelled planned sections for event, Yogi, visitor and finance modules.
 

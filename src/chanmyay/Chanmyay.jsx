@@ -433,41 +433,85 @@ function TvDisplay({ donors, error }) {
           Full screen
         </button>
       </div>
-      <header>
-        <div className="cm-lotus">✳</div>
-        <p>CHANMYAY YEIKTHA MEDITATION CENTRE · SINGAPORE</p>
-        <h1 lang="my">ယနေ့ အလှူရှင်များ</h1>
-        <h2>Today’s generous donors</h2>
-        <div className="cm-tv-date">
-          {formatDate(today, {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-          })}
+      <header className="cm-donation-header">
+        <svg className="cm-tv-emblem" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="32" />
+          <circle cx="50" cy="50" r="9" />
+          {Array.from({ length: 8 }, (_, i) => (
+            <path key={i} d="M50 41V10" transform={`rotate(${i * 45} 50 50)`} />
+          ))}
+        </svg>
+        <div>
+          <p>CHANMYAY YEIKTHA MEDITATION CENTRE (SINGAPORE)</p>
+          <h1 lang="my">ယနေ့ အလှူရှင်များ</h1>
+          <h2>Daily offerings &amp; dedications</h2>
+          <div className="cm-tv-date">
+            {formatDate(today, {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+            })}
+          </div>
         </div>
+        <svg className="cm-tv-emblem" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="32" />
+          <circle cx="50" cy="50" r="9" />
+          {Array.from({ length: 8 }, (_, i) => (
+            <path key={i} d="M50 41V10" transform={`rotate(${i * 45} 50 50)`} />
+          ))}
+        </svg>
       </header>
       {error ? (
-        <p role="alert">{error}</p>
-      ) : page ? (
-        <section className="cm-tv-offering">
-          <div className="cm-tv-category">
-            <span>{page.category.icon}</span>
-            <h3 lang="my">{page.category.myanmar}</h3>
-            <p>{page.category.label}</p>
-          </div>
-          <div className="cm-tv-names">
-            {page.donors.map((donor) => (
-              <article key={donor.id}>
-                <h4>{donor.name}</h4>
-                {donor.dedication && <p>{donor.dedication}</p>}
-              </article>
-            ))}
-          </div>
-        </section>
+        <p role="alert" className="cm-error">
+          {error}
+        </p>
       ) : (
-        <section className="cm-tv-empty">
-          <h3>May your generosity bring peace and happiness.</h3>
-          <p>Approved offerings for today will appear here.</p>
+        <section
+          className="cm-donation-board"
+          aria-label="Today's donation register"
+        >
+          <table className="cm-donation-table">
+            <colgroup>
+              <col className="cm-offering-column" />
+              <col />
+            </colgroup>
+            <caption className="cm-sr-only">
+              Approved donors for today in Singapore
+            </caption>
+            <tbody>
+              {page.rows.map(({ category, donors: rowDonors, total }) => (
+                <tr key={category.id}>
+                  <th scope="row">
+                    <span lang="my">
+                      {
+                        {
+                          breakfast: "အရုဏ်ဆွမ်းအလှူ",
+                          lunch: "နေ့ဆွမ်းအလှူ",
+                          water: "သောက်ရေသန့်အလှူ",
+                          drinks: "အအေးအလှူ",
+                        }[category.id]
+                      }
+                    </span>
+                    <small>{category.label}</small>
+                  </th>
+                  <td>
+                    {rowDonors.length ? (
+                      rowDonors.map((donor) => (
+                        <article key={donor.id}>
+                          <h3>{donor.name}</h3>
+                          {donor.dedication && <p>{donor.dedication}</p>}
+                        </article>
+                      ))
+                    ) : (
+                      <p className="cm-tv-no-donor">
+                        {total ? "—" : "အလှူရှင်စာရင်း မရှိသေးပါ"}
+                      </p>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </section>
       )}
       <footer>
