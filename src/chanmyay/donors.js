@@ -23,7 +23,7 @@ export function formatDate(date, options = {}) {
     timeZone: "Asia/Singapore",
   }).format(new Date(`${date}T12:00:00+08:00`));
 }
-function validDate(value) {
+export function validDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const parsed = new Date(`${value}T00:00:00Z`);
   return (

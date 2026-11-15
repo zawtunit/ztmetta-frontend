@@ -42,3 +42,5 @@ Connect a shared API and database, staff authentication and permissions, a chang
 ## Verification
 
 Production build passed. Browser checks covered adding/editing an offering, date-range persistence after reload, approval changes updating a second TV tab, and exclusion of phone details from the TV. Logic checks covered Singapore midnight, invalid and reversed dates, inclusive ranges, pending/cancelled filtering, pagination and CSV formula escaping.
+
+The TV display supports an offering date selector and Today reset. A selected date is stored in `?date=YYYY-MM-DD` for bookmarking; without it the display follows the current Singapore date.

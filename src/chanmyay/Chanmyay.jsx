@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   CATEGORIES,
   STORAGE_KEY,
@@ -11,6 +11,7 @@ import {
   tvPages,
   donorCsv,
   dailyOfferings,
+  validDate,
 } from "./donors.js";
 import "./chanmyay.css";
 
@@ -406,7 +407,17 @@ function TvDisplay({ donors, error }) {
   const [today, setToday] = useState(singaporeDate());
   const [index, setIndex] = useState(0);
   const [fullscreenError, setFullscreenError] = useState("");
-  const pages = tvPages(donors, today);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedDate = searchParams.get("date") || "";
+  const displayDate = validDate(requestedDate) ? requestedDate : today;
+  const pages = tvPages(donors, displayDate);
+  function chooseDate(date) {
+    const next = new URLSearchParams(searchParams);
+    if (date) next.set("date", date);
+    else next.delete("date");
+    setSearchParams(next, { replace: true });
+    setIndex(0);
+  }
   useEffect(() => {
     const timer = setInterval(() => {
       setToday(singaporeDate());
@@ -419,6 +430,12 @@ function TvDisplay({ donors, error }) {
     <main className="cm-tv">
       <div className="cm-tv-tools">
         <Link to="/chanmyay">← Staff dashboard</Link>
+        <div className="cm-tv-date-controls">
+          <label htmlFor="tv-offering-date">Offering date</label>
+          <input id="tv-offering-date" type="date" value={displayDate}
+            onChange={(event) => { if (validDate(event.target.value)) chooseDate(event.target.value); }} />
+          <button onClick={() => chooseDate("")}>Today</button>
+        </div>
         <button
           onClick={async () => {
             try {
@@ -444,10 +461,10 @@ function TvDisplay({ donors, error }) {
         </svg>
         <div>
           <p>CHANMYAY YEIKTHA MEDITATION CENTRE (SINGAPORE)</p>
-          <h1 lang="my">ယနေ့ အလှူရှင်များ</h1>
+          <h1 lang="my">{displayDate === today ? "ယနေ့ အလှူရှင်များ" : "အလှူရှင်များ"}</h1>
           <h2>Daily offerings &amp; dedications</h2>
           <div className="cm-tv-date">
-            {formatDate(today, {
+            {formatDate(displayDate, {
               weekday: "long",
               year: "numeric",
               month: "long",
@@ -469,7 +486,7 @@ function TvDisplay({ donors, error }) {
       ) : (
         <section
           className="cm-donation-board"
-          aria-label="Today's donation register"
+          aria-label="Donation register for selected date"
         >
           <table className="cm-donation-table">
             <colgroup>
@@ -477,7 +494,7 @@ function TvDisplay({ donors, error }) {
               <col />
             </colgroup>
             <caption className="cm-sr-only">
-              Approved donors for today in Singapore
+              Approved donors for {formatDate(displayDate, { year: "numeric" })} in Singapore
             </caption>
             <tbody>
               {page.rows.map(({ category, donors: rowDonors, total }) => (
@@ -524,7 +541,7 @@ function TvDisplay({ donors, error }) {
             seconds
           </div>
         )}
-        <small>Preview · Records from this browser only · Singapore time</small>
+        <small>Preview · Records from this browser only · Singapore time{requestedDate && " · Fixed date selected"}</small>
         {fullscreenError && <p>{fullscreenError}</p>}
       </footer>
     </main>
@@ -746,6 +763,7 @@ export default function Chanmyay() {
                     </h2>
                     <p>Newest dates first · Select a donor to edit their offering.</p>
                   </div>
+                  <div className="cm-register-actions">
                   <button
                     className="cm-button secondary"
                     onClick={download}
@@ -754,6 +772,16 @@ export default function Chanmyay() {
                     <Icon name="download" />
                     Export CSV
                   </button>
+                    <Link
+                      className="cm-button secondary"
+                      to="/chanmyay/tv"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Icon name="tv" />
+                      View on TV
+                    </Link>
+                  </div>
                 </div>
                 <div className="cm-filters">
                   <label className="cm-search">

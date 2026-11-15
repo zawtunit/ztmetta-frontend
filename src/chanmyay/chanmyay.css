@@ -1479,3 +1479,19 @@ svg.cm-tv-emblem {
   .cm-date-pagination .cm-button { padding: 10px; font-size: 11px; }
   .cm-page-heading > .cm-button { margin-top: 0; min-height: 44px; }
 }
+
+.cm-register-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+@media (max-width: 760px) {
+  .cm-register-heading { flex-wrap: wrap; }
+  .cm-register-actions { width: 100%; }
+  .cm-register-actions .cm-button { justify-content: center; min-height: 44px; flex: 1; font-size: 11px !important; padding: 10px; }
+}
+
+.cm-tv-tools { align-items: center; gap: 12px; flex-wrap: wrap; }
+.cm-tv-date-controls { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.cm-tv-date-controls label { font-size: 12px; font-weight: 600; }
+.cm-tv-date-controls input { font: inherit; padding: 7px 10px; border: 1px solid #9eb690; border-radius: 6px; color: #31593b; background: #ffffffe8; }
+@media (max-width: 760px) {
+  .cm-tv-date-controls { order: 3; width: 100%; }
+  .cm-tv-date-controls input { font-size: 16px; }
+}
