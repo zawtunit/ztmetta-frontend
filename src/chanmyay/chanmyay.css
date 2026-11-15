@@ -1495,3 +1495,37 @@ svg.cm-tv-emblem {
   .cm-tv-date-controls { order: 3; width: 100%; }
   .cm-tv-date-controls input { font-size: 16px; }
 }
+
+/* Keep the decorative image corners visible in narrow portrait layouts. */
+@media (max-width: 760px) {
+  .cm-tv {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(#fff0e2, #fff9e8 45%, #f5edcf);
+    padding-bottom: 120px;
+  }
+  .cm-tv::before,
+  .cm-tv::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("/chanmyay/lotus-background.webp");
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+  }
+  .cm-tv::before {
+    top: 0;
+    height: 95px;
+    background-position: center top;
+    mask-image: linear-gradient(#000 60%, transparent);
+  }
+  .cm-tv::after {
+    bottom: 0;
+    height: 120px;
+    background-position: center bottom;
+    mask-image: linear-gradient(transparent, #000 35%);
+  }
+}
