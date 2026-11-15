@@ -169,7 +169,7 @@ function DonorForm({ donor, onClose, onSave }) {
       startDate: singaporeDate(),
       endDate: singaporeDate(),
       categories: [],
-      status: "Pending",
+      status: "Approved",
     },
   );
   const [error, setError] = useState("");
