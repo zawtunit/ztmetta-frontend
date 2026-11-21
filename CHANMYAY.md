@@ -14,8 +14,9 @@ The event-title feature works in the browser preview. The shared database integr
 - Multiple donors per category. Cancelled/Pending records stay off the TV.
 - Event name / TV heading in the dashboard replaces the Myanmar donor heading. Clear and save to restore the standard heading. This is one centre-wide title, including when viewing another date.
 - Date selector and Today reset on the TV. A `?date=YYYY-MM-DD` link pins a date; without it the display follows Singapore time.
-- Four TV rows, up to two donors per category per page, rotating every 12 seconds. Categories with no approved donor display “ချမ်းမြေ့အဖွဲ့ဝင်များ အလှူ”. A later rotation page for a category that already has donors displays a dash rather than claiming there are none.
+- Four TV rows, up to two donors per category per page, rotating every 12 seconds. Long names/dedications rotate one donor at a time to preserve readability. Categories with no approved donor display “ချမ်းမြေ့အဖွဲ့ဝင်များ အလှူ”. A later rotation page for a category that already has donors displays a dash rather than claiming there are none.
 - Lotus/Bodhi background, larger centre heading, clean full-screen/presentation mode and Show controls at the bottom.
+- Landscape TVs and presentation mode fit the viewport without scrolling. The four offering rows share the remaining space; headings, names and dedications fit their allotted boxes without truncation. Normal portrait browsing stays scrollable.
 - CSV export and planned sections for event, Yogi, visitor and finance modules.
 
 ## Connect the shared database
@@ -48,3 +49,5 @@ npm run build
 `test:shared` uses an ephemeral PostgreSQL-compatible PGlite database, with test-only Auth role fixtures, and applies the real migration. It verifies the singleton administrator, denied anonymous and other-user access, public phone exclusion, approval and inclusive-date filters, event title, stale-edit rejection, validation, import idempotency and private change history. It does not prove that a hosted Supabase project is configured; verify that separately after connection.
 
 Browser checks covered the editable Myanmar event title, persistence after navigation, and offering saves after the async data layer change. Existing donor workflow/layout and TV controls remain in place.
+
+TV fit validation: measured document size equal to viewport at 1280×720 and 1920×1080, with two donors per row. Long Myanmar names, long event title and 290-character dedications fit within their cells at 720p. Portrait full-screen also fit 390×844; additional donors remained present across rotation pages.

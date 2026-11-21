@@ -64,14 +64,18 @@ export function tvPages(donors, date) {
         donor.categories.includes(category.id),
     ),
   }));
+  // Long names/dedications get their own rotation page to stay readable on TV.
+  groups.forEach((group) => {
+    group.pageSize = group.donors.some((donor) => donor.name.length + donor.dedication.length > 180) ? 1 : 2;
+  });
   const pageCount = Math.max(
     1,
-    ...groups.map((group) => Math.ceil(group.donors.length / 2)),
+    ...groups.map((group) => Math.ceil(group.donors.length / group.pageSize)),
   );
   return Array.from({ length: pageCount }, (_, index) => ({
     rows: groups.map((group) => ({
       category: group.category,
-      donors: group.donors.slice(index * 2, index * 2 + 2),
+      donors: group.donors.slice(index * group.pageSize, (index + 1) * group.pageSize),
       total: group.donors.length,
     })),
   }));

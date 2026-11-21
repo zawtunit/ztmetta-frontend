@@ -13,6 +13,7 @@ import {
 } from "./donors.js";
 import "./chanmyay.css";
 import { useRegister } from "./useRegister.js";
+import TvFitText from "./TvFitText.jsx";
 import { AdministratorLogin, DisplaySettings, ImportBrowserRecords } from "./RegisterControls.jsx";
 
 function Icon({ name, ...props }) {
@@ -370,6 +371,14 @@ function DonorForm({ donor, onClose, onSave }) {
 function TvDisplay({ donors, error, settings, mode, loading, today }) {
   const [index, setIndex] = useState(0);
   const [presenting, setPresenting] = useState(false);
+  const [wideScreen, setWideScreen] = useState(() => window.matchMedia("(min-aspect-ratio: 4/3)").matches);
+  const fitScreen = presenting || wideScreen;
+  useEffect(() => {
+    const query = window.matchMedia("(min-aspect-ratio: 4/3)");
+    const update = () => setWideScreen(query.matches);
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   function showControls() {
     setPresenting(false);
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -405,7 +414,7 @@ function TvDisplay({ donors, error, settings, mode, loading, today }) {
   }, []);
   const page = pages.length ? pages[index % pages.length] : null;
   return (
-    <main className={`cm-tv${presenting ? " cm-tv-presenting" : ""}`}>
+    <main className={`cm-tv${presenting ? " cm-tv-presenting" : ""}${fitScreen ? " cm-tv-fit-screen" : ""}`}>
       <div className="cm-tv-tools">
         <Link to="/chanmyay">← Staff dashboard</Link>
         <div className="cm-tv-date-controls">
@@ -435,8 +444,8 @@ function TvDisplay({ donors, error, settings, mode, loading, today }) {
             <path key={i} d="M50 41V10" transform={`rotate(${i * 45} 50 50)`} />
           ))}
         </svg>
-        <div>
-          <p>CHANMYAY YEIKTHA MEDITATION CENTRE (SINGAPORE)</p>
+        <TvFitText active={fitScreen} className="cm-tv-title-fit">
+          <p className="cm-centre-heading">CHANMYAY YEIKTHA MEDITATION CENTRE (SINGAPORE)</p>
           <h1 lang={settings.eventName ? undefined : "my"}>{settings.eventName || (displayDate === today ? "ယနေ့ အလှူရှင်များ" : "အလှူရှင်များ")}</h1>
           <h2>Daily offerings &amp; dedications</h2>
           <div className="cm-tv-date">
@@ -446,7 +455,7 @@ function TvDisplay({ donors, error, settings, mode, loading, today }) {
               month: "long",
             })}
           </div>
-        </div>
+        </TvFitText>
         <svg className="cm-tv-emblem" viewBox="0 0 100 100" aria-hidden="true">
           <circle cx="50" cy="50" r="32" />
           <circle cx="50" cy="50" r="9" />
@@ -476,6 +485,7 @@ function TvDisplay({ donors, error, settings, mode, loading, today }) {
               {page.rows.map(({ category, donors: rowDonors, total }) => (
                 <tr key={category.id}>
                   <th scope="row">
+                    <TvFitText active={fitScreen}>
                     <span lang="my">
                       {
                         {
@@ -487,8 +497,10 @@ function TvDisplay({ donors, error, settings, mode, loading, today }) {
                       }
                     </span>
                     <small>{category.label}</small>
+                    </TvFitText>
                   </th>
                   <td>
+                    <TvFitText active={fitScreen}>
                     {rowDonors.length ? (
                       rowDonors.map((donor) => (
                         <article key={donor.id}>
@@ -503,6 +515,7 @@ function TvDisplay({ donors, error, settings, mode, loading, today }) {
                         <h3 lang="my">ချမ်းမြေ့အဖွဲ့ဝင်များ အလှူ</h3>
                       </article>
                     )}
+                    </TvFitText>
                   </td>
                 </tr>
               ))}
